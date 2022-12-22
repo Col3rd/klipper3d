@@ -16,14 +16,16 @@ class ScaraKinematics:
         self.psi_limits = config.getfloatlist('psi_limits')
         self.min_radius = config.getfloat('minimum_radius')
         self.arm_mode = config.getint('arm_mode')
-        rail_proximal = stepper.PrinterRail(config.getsection('stepper_proximal'),
+        stepper_proximal_cfg = config.getsection('stepper_proximal')
+        rail_proximal = stepper.PrinterRail(stepper_proximal_cfg,
                                              units_in_radians=True)
         logging.info('test1')
-        self.proximal_length = rail_proximal.getfloat('position_max')
+        self.proximal_length = stepper_proximal_cfg.getfloat('position_max')
         
-        rail_distal = stepper.PrinterRail(config.getsection('stepper_distal'),
+        stepper_distal_cfg = config.getsection('stepper_distal')
+        rail_distal = stepper.PrinterRail(stepper_distal_cfg,
                                              units_in_radians=True)
-        self.distal_length = rail_distal.getfloat('position_max')
+        self.distal_length = stepper_distal_cfg.getfloat('position_max')
 
         rail_proximal.setup_itersolve(
             'scara_stepper_alloc', b'p', 
@@ -83,8 +85,7 @@ class ScaraKinematics:
         # Converts stepper positioning to cartesian coordinates
         theta = stepper_positions[self.rails[0].get_name()]
         psi = stepper_positions[self.rails[1].get_name()] * (self.crosstalk[0] * theta)
-        x_pos = (math.acos(theta) * self.proximal_length) + (math.acos(psi + theta) * self.distal_length)
-        y_pos = (math.asin(theta) * self.proximal_length) + (math.asin(psi + theta) * self.distal_length)
+        [x_pos, y_pos] = self.angle_to_pos(theta, psi)
         z_pos = stepper_positions[self.rails[2].get_name()]
         return [x_pos, y_pos, z_pos]
 
