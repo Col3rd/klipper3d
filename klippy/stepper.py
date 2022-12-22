@@ -3,7 +3,7 @@
 # Copyright (C) 2016-2021  Kevin O'Connor <kevin@koconnor.net>
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
-import math, logging, collections
+import math, logging, collections, configfile
 import chelper
 
 class error(Exception):
@@ -294,6 +294,7 @@ def parse_step_distance(config, units_in_radians=None, note_valid=False):
 class PrinterRail:
     def __init__(self, config, need_position_minmax=True,
                  default_position_endstop=None, units_in_radians=False):
+        self.config = config
         # Primary stepper and endstop
         self.stepper_units_in_radians = units_in_radians
         self.steppers = []
@@ -368,6 +369,12 @@ class PrinterRail:
         return list(self.steppers)
     def get_endstops(self):
         return list(self.endstops)
+    def get_len(self):
+        return self.axis_len
+    def getfloat(self, option):
+        return self.config.getfloat(option, configfile.sentinel, None, None, None, None, True)
+    def get(self, option, default=configfile.sentinel, note_valid=True):
+        return self.config.get(option, default, note_valid)
     def add_extra_stepper(self, config):
         stepper = PrinterStepper(config, self.stepper_units_in_radians)
         self.steppers.append(stepper)
