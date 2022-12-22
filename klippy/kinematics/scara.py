@@ -3,7 +3,7 @@
 # Copyright (C) 2021 Koal Designs <koaldesigns@gmail.com>
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
-import logging, math, debugpy
+import logging, math #, debugpy
 import stepper, mathutil, chelper
 
 class ScaraKinematics:
@@ -106,7 +106,7 @@ class ScaraKinematics:
     def home(self, homing_state):
         # Always home X/Y = Prox/Dist together
         # How to specify rotational homing which is not the theta/psi angle 0?
-        debugpy.breakpoint()
+        # debugpy.breakpoint()
         homing_axes = homing_state.get_axes()
         logging.info('Homing: %s', homing_axes)
         home_xy = 0 in homing_axes or 1 in homing_axes
@@ -186,14 +186,14 @@ class ScaraKinematics:
         # Try current arm mode, then the other (right=true, left=false)
         while True:
             if self.arm_mode:
-                if self.continuous_rotation[1] | (psi >= self.psi_limits[0] & psi <= self.psi_limits[1]):
+                if self.continuous_rotation[1] or (psi >= self.psi_limits[0] and psi <= self.psi_limits[1]):
                     theta = self.theta = math.atan2(sk_1 * y - sk_2 * x, sk_1 * x + sk_2 * y)
-                    if self.continuous_rotation[0] | (theta >= self.theta_limits[0] & theta <= self.theta_limits[1]):
+                    if self.continuous_rotation[0] or (theta >= self.theta_limits[0] and theta <= self.theta_limits[1]):
                         return True
             else:
-                if self.continuous_rotation[1] | (-psi >= self.psi_limits[0] & -psi <= self.psi_limits[1]):
+                if self.continuous_rotation[1] or (-psi >= self.psi_limits[0] and -psi <= self.psi_limits[1]):
                     theta = self.theta = math.atan2(sk_1 * y + sk_2 * x, sk_1 * x - sk_2 * y)
-                    if self.continuous_rotation[0] | (theta >= self.theta_limits[0] & theta <= self.theta_limits[1]):
+                    if self.continuous_rotation[0] or (theta >= self.theta_limits[0] and theta <= self.theta_limits[1]):
                         psi = self.psi = -psi
                         return True
             return False

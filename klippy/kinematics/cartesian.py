@@ -3,7 +3,7 @@
 # Copyright (C) 2016-2021  Kevin O'Connor <kevin@koconnor.net>
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
-import logging
+import logging #, debugpy
 import stepper
 
 class CartKinematics:
@@ -75,6 +75,7 @@ class CartKinematics:
         # Perform homing
         homing_state.home_rails([rail], forcepos, homepos)
     def home(self, homing_state):
+        # debugpy.breakpoint()
         # Each axis is homed independently and in order
         for axis in homing_state.get_axes():
             if axis == self.dual_carriage_axis:
